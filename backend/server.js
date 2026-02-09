@@ -1,22 +1,35 @@
 ﻿const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || 'admin@example.com').split(',').map(email => email.trim());
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'change-me';
+
+const storyRoutes = require('./routes/storyRoutes');
+const chapterRoutes = require('./routes/chapterRoutes');
 
 app.get('/', (req, res) => {
   res.json({ status: 'AtmaRekha backend running' });
 });
 
+app.use('/api/stories', storyRoutes);
+app.use('/api/chapters', chapterRoutes);
+
+
 app.post('/admin/login', (req, res) => {
   const { email, password } = req.body || {};
 
-  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+  if (ADMIN_EMAILS.includes(email) && password === ADMIN_PASSWORD) {
     return res.json({ success: true, role: 'admin' });
   }
 
