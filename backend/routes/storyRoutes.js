@@ -13,6 +13,17 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get a single story
+router.get('/detail/:id', async (req, res) => {
+    try {
+        const story = await Story.findById(req.params.id);
+        if (!story) return res.status(404).json({ message: 'Story not found' });
+        res.json(story);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // Create a new story (with cover image)
 router.post('/', parser.single('coverImage'), async (req, res) => {
     try {
