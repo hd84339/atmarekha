@@ -10,12 +10,10 @@
       <nav className="pt-20">
         {[
           ['#index', 'Home'],
-          ['#dashboard', 'Dashboard'],
           ['#about', 'About'],
           ['#latest', 'Latest Updates'],
           ['#contact', 'Contact'],
-          ['#help', 'Help'],
-          ['#admin', 'Admin Login']
+          ['#help', 'Help']
         ].map(([href, label]) => (
           <a
             key={href}

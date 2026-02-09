@@ -14,6 +14,7 @@ import FabPlay from './components/ui/FabPlay';
 import CommentsSheet from './components/modals/CommentsSheet';
 import RatingModal from './components/modals/RatingModal';
 import ComingSoonModal from './components/modals/ComingSoonModal';
+import Dashboard from './components/sections/Dashboard';
 
 export default function App() {
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -29,6 +30,7 @@ export default function App() {
   const [activeChapter, setActiveChapter] = useState('Ch. 1');
   const [commentInput, setCommentInput] = useState('');
   const [commentsByChapter, setCommentsByChapter] = useState({});
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const heroBg = isDark
     ? 'linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.7)), url(https://images.pexels.com/photos/16747101/pexels-photo-16747101.jpeg?auto=compress&cs=tinysrgb&w=2070)'
@@ -44,6 +46,10 @@ export default function App() {
     if (savedRating) setDisplayRating(savedRating);
     const savedState = localStorage.getItem('isSaved');
     if (savedState === 'true') setIsSaved(true);
+
+    // Check admin status
+    const adminStatus = localStorage.getItem('isAdmin');
+    if (adminStatus === 'true') setIsAdmin(true);
   }, []);
 
   useEffect(() => {
@@ -58,7 +64,13 @@ export default function App() {
   useEffect(() => {
     const handleRoute = () => {
       const hash = window.location.hash.split('?')[0] || '#index';
-      const pageId = hash.replace('#', '') || 'index';
+      let pageId = hash.replace('#', '') || 'index';
+
+      // Route admin chapters to dashboard
+      if (pageId.startsWith('admin-chapters/') || pageId === 'admin-chapters') {
+        pageId = 'dashboard';
+      }
+
       setActivePage(pageId);
     };
 
@@ -129,6 +141,18 @@ export default function App() {
     setIsRatingOpen(false);
   };
 
+  const handleLoginSuccess = () => {
+    setIsAdmin(true);
+    localStorage.setItem('isAdmin', 'true');
+    window.location.hash = '#dashboard';
+  };
+
+  const handleLogout = () => {
+    setIsAdmin(false);
+    localStorage.removeItem('isAdmin');
+    window.location.hash = '#index';
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-100">
       <Sidebar isOpen={isNavOpen} onClose={toggleNav} />
@@ -154,9 +178,16 @@ export default function App() {
         />
       )}
 
-      {activePage === 'admin' && <AdminLogin apiBaseUrl={apiBaseUrl} />}
+      {activePage === 'admin' && (
+        <AdminLogin
+          apiBaseUrl={apiBaseUrl}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
 
-      <Footer />
+      {activePage === 'dashboard' && isAdmin && <Dashboard />}
+
+      <Footer isAdmin={isAdmin} onLogout={handleLogout} />
       <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
       <FabPlay onClick={() => (window.location.hash = '#reading')} />
 
