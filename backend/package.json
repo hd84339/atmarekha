@@ -4,7 +4,9 @@
   "version": "0.0.1",
   "type": "commonjs",
   "scripts": {
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "echo 'Build skipped (no frontend assets in backend)'"
   },
   "dependencies": {
     "cloudinary": "^1.41.3",
