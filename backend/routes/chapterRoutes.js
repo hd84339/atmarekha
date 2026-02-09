@@ -14,6 +14,17 @@ router.get('/:storyId', async (req, res) => {
     }
 });
 
+// Get a single chapter by ID
+router.get('/detail/:id', async (req, res) => {
+    try {
+        const chapter = await Chapter.findById(req.params.id);
+        if (!chapter) return res.status(404).json({ message: 'Chapter not found' });
+        res.json(chapter);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // Add a new chapter (supports multiple images OR single PDF)
 router.post('/:storyId', parser.array('pages'), async (req, res) => {
     try {

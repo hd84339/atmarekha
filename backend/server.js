@@ -17,6 +17,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'change-me';
 
 const storyRoutes = require('./routes/storyRoutes');
 const chapterRoutes = require('./routes/chapterRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 app.get('/', (req, res) => {
   res.json({ status: 'AtmaRekha backend running' });
@@ -24,6 +25,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/stories', storyRoutes);
 app.use('/api/chapters', chapterRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 
 app.post('/admin/login', (req, res) => {

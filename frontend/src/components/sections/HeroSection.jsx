@@ -15,17 +15,7 @@
         <br />
         coming soon
       </p>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-        <a href="#reading" className="hero-cta rounded-full bg-zinc-900 px-8 py-3 text-base font-semibold text-white transition hover:-translate-y-0.5 dark:bg-white dark:text-black">
-          Start Reading
-        </a>
-        <button
-          onClick={onOpenComingSoon}
-          className="hero-cta rounded-full border-2 border-zinc-900/50 px-8 py-3 text-base font-semibold text-zinc-900/80 transition hover:border-zinc-900 hover:bg-zinc-900/10 hover:text-zinc-900 dark:border-white/60 dark:text-white/80 dark:hover:border-white dark:hover:bg-white/10 dark:hover:text-white"
-        >
-          Publish Story
-        </button>
-      </div>
+
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AdminStories from './AdminStories';
 import AdminChapters from './AdminChapters';
+import AdminReviews from './AdminReviews';
 
 export default function Dashboard() {
     const [view, setView] = useState('home');
@@ -51,6 +52,15 @@ export default function Dashboard() {
             );
         }
 
+        if (view === 'reviews') {
+            return (
+                <AdminReviews
+                    apiBaseUrl={apiBaseUrl}
+                    onBack={() => setView('home')}
+                />
+            );
+        }
+
         return (
             <>
                 <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Admin Dashboard</h1>
@@ -67,15 +77,15 @@ export default function Dashboard() {
                         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Add, edit, or delete stories and their chapters.</p>
                     </div>
 
-                    <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 opacity-50">
-                        <h3 className="font-semibold text-zinc-900 dark:text-white">User Comments</h3>
-                        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Moderate and reply to reader comments. (Coming Soon)</p>
+                    <div
+                        onClick={() => setView('reviews')}
+                        className="cursor-pointer rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
+                    >
+                        <h3 className="font-semibold text-zinc-900 dark:text-white">Manage Reviews</h3>
+                        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Moderate reader reviews.</p>
                     </div>
 
-                    <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 opacity-50">
-                        <h3 className="font-semibold text-zinc-900 dark:text-white">Analytics</h3>
-                        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">View readership content. (Coming Soon)</p>
-                    </div>
+
                 </div>
             </>
         );

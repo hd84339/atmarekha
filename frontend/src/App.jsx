@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 import { gsap } from 'gsap';
+import ChapterReader from './components/sections/ChapterReader';
 
 import { buildChapters } from './data/chapters';
 import Sidebar from './components/Sidebar';
@@ -20,6 +21,8 @@ export default function App() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [activePage, setActivePage] = useState('index');
+  const [activeStoryId, setActiveStoryId] = useState(null);
+  const [activeChapterId, setActiveChapterId] = useState(null);
   const [isReversed, setIsReversed] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
   const [displayRating, setDisplayRating] = useState('4.9');
@@ -29,6 +32,7 @@ export default function App() {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [activeChapter, setActiveChapter] = useState('Ch. 1');
   const [commentInput, setCommentInput] = useState('');
+  const [commentName, setCommentName] = useState(''); // New state for name
   const [commentsByChapter, setCommentsByChapter] = useState({});
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -66,9 +70,19 @@ export default function App() {
       const hash = window.location.hash.split('?')[0] || '#index';
       let pageId = hash.replace('#', '') || 'index';
 
-      // Route admin chapters to dashboard
       if (pageId.startsWith('admin-chapters/') || pageId === 'admin-chapters') {
         pageId = 'dashboard';
+      } else if (pageId.startsWith('reading/')) {
+        const storyId = pageId.split('/')[1];
+        setActiveStoryId(storyId);
+        pageId = 'reading';
+      } else if (pageId === 'reading') {
+        setActiveStoryId(null);
+        // Fallback logic could go here if needed
+      } else if (pageId.startsWith('read-chapter/')) {
+        const chapterId = pageId.split('/')[1];
+        setActiveChapterId(chapterId);
+        pageId = 'chapter-reader';
       }
 
       setActivePage(pageId);
@@ -117,14 +131,18 @@ export default function App() {
   const closeComments = () => {
     setIsCommentsOpen(false);
     setCommentInput('');
+    setCommentName(''); // Clear name on close
   };
 
   const postComment = () => {
-    const value = commentInput.trim();
-    if (!value) return;
+    const text = commentInput.trim();
+    const name = commentName.trim() || 'Anonymous';
+    if (!text) return;
+
     setCommentsByChapter((prev) => {
       const next = { ...prev };
-      next[activeChapter] = [...(next[activeChapter] || []), value];
+      const newComment = { name, text, date: new Date().toISOString() };
+      next[activeChapter] = [...(next[activeChapter] || []), newComment];
       return next;
     });
     setCommentInput('');
@@ -167,7 +185,8 @@ export default function App() {
 
       {activePage === 'reading' && (
         <ReadingPage
-          chapters={chapters}
+          storyId={activeStoryId}
+          dummyChapters={chapters}
           displayRating={displayRating}
           isSaved={isSaved}
           onOpenRating={() => setIsRatingOpen(true)}
@@ -175,6 +194,13 @@ export default function App() {
           onSortToggle={() => setIsReversed((prev) => !prev)}
           onOpenComments={openComments}
           onBack={() => (window.location.hash = '#index')}
+        />
+      )}
+
+      {activePage === 'chapter-reader' && (
+        <ChapterReader
+          chapterId={activeChapterId}
+          onBack={() => window.history.back()}
         />
       )}
 
@@ -197,6 +223,8 @@ export default function App() {
         comments={commentsByChapter[activeChapter]}
         inputValue={commentInput}
         onInputChange={(event) => setCommentInput(event.target.value)}
+        nameValue={commentName}
+        onNameChange={(event) => setCommentName(event.target.value)}
         onSubmit={postComment}
         onClose={closeComments}
       />
