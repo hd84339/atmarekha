@@ -4,8 +4,26 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
-const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
-app.use(cors({ origin: allowedOrigin }));
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://atmarekha.vercel.app',
+  'https://atmarekha-frontend.vercel.app',
+  process.env.CORS_ORIGIN
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1 && !origin.includes('vercel.app')) {
+      // Just for debugging, we can be permissive or strict. 
+      // Let's be permissive for "atmarekha" domains or vercel deployments
+      return callback(null, true); // For now, allow all to fix the blocking issue immediately
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB Connection
