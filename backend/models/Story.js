@@ -30,6 +30,10 @@ const storySchema = new mongoose.Schema({
         default: 'Fantasy',
         enum: ['Fantasy', 'Action', 'Drama', 'Horror', 'Romance', 'Sci-Fi', 'Slice of Life', 'Mystery']
     },
+    likes: {
+        type: Number,
+        default: 0
+    },
     createdAt: {
         type: Date,
         default: Date.now

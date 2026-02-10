@@ -3,19 +3,17 @@ import axios from 'axios';
 
 export default function ReadingPage({
   storyId,
-  displayRating,
-  isSaved,
-  onOpenRating,
-  onToggleSave,
-  onSortToggle,
   onOpenComments,
   onBack,
-  isReversed // Added missing prop
+  onSortToggle,
+  isReversed
 }) {
   const [chapters, setChapters] = useState([]);
   const [story, setStory] = useState(null);
   const [allStories, setAllStories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [localLikes, setLocalLikes] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
   useEffect(() => {
@@ -34,7 +32,13 @@ export default function ReadingPage({
           axios.get(`${apiBaseUrl}/api/chapters/${storyId}`)
         ]);
         setStory(storyRes.data);
+        setLocalLikes(storyRes.data.likes || 0);
         setChapters(chaptersRes.data);
+
+        // Check local storage for liked status
+        const likedStories = JSON.parse(localStorage.getItem('likedStories') || '{}');
+        if (likedStories[storyId]) setHasLiked(true);
+
       } catch (err) {
         console.error('Failed to fetch data:', err);
       } finally {
@@ -43,6 +47,21 @@ export default function ReadingPage({
     };
     fetchData();
   }, [storyId]);
+
+  const handleLike = async () => {
+    if (hasLiked) return;
+    try {
+      const res = await axios.put(`${apiBaseUrl}/api/stories/${storyId}/like`);
+      setLocalLikes(res.data.likes);
+      setHasLiked(true);
+
+      const likedStories = JSON.parse(localStorage.getItem('likedStories') || '{}');
+      likedStories[storyId] = true;
+      localStorage.setItem('likedStories', JSON.stringify(likedStories));
+    } catch (err) {
+      console.error('Failed to like story:', err);
+    }
+  };
 
   const fetchAllStories = async () => {
     setLoading(true);
@@ -141,12 +160,33 @@ export default function ReadingPage({
             <p className="mt-3 text-xl font-medium text-zinc-700 dark:text-zinc-200">by {story.author || 'AtmaRekha Team'}</p>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:justify-start">
-              <button onClick={onOpenRating} className="flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-sm font-bold text-zinc-800 shadow-sm backdrop-blur transition hover:bg-white hover:scale-105 dark:bg-black/50 dark:text-white">
-                <i className="fa-solid fa-star text-yellow-400"></i> {displayRating}
+              {/* Like Button */}
+              <button
+                onClick={handleLike}
+                disabled={hasLiked}
+                className={`flex items-center gap-2 rounded-full px-6 py-2 text-sm font-bold shadow-lg transition hover:scale-105 ${hasLiked
+                  ? 'bg-rose-600 text-white shadow-rose-600/30'
+                  : 'bg-white/80 text-rose-600 backdrop-blur hover:bg-white dark:bg-black/50 dark:text-rose-400'
+                  }`}
+              >
+                <i className={`${hasLiked ? 'fa-solid' : 'fa-regular'} fa-heart`}></i>
+                {localLikes} Likes
               </button>
-              <button onClick={onToggleSave} className="flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-sm font-bold text-white shadow-lg shadow-blue-600/30 transition hover:bg-blue-700 hover:scale-105">
-                <i className={isSaved ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}></i> {isSaved ? 'Saved' : 'Save to Library'}
-              </button>
+
+              {/* Continue Reading Button */}
+              {chapters.length > 0 && (() => {
+                const sortedChapters = [...chapters].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                const firstChapterId = sortedChapters[0]?._id;
+                return firstChapterId ? (
+                  <a
+                    href={`#read-chapter/${firstChapterId}`}
+                    className="flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-sm font-bold text-white shadow-lg shadow-blue-600/30 transition hover:bg-blue-700 hover:scale-105"
+                  >
+                    <i className="fa-solid fa-book-open"></i> Continue Reading
+                  </a>
+                ) : null;
+              })()}
+
               <span className="rounded-full border border-zinc-200 bg-white/50 px-4 py-2 text-sm font-semibold text-zinc-600 backdrop-blur dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-300">
                 {chapters.length} Episodes
               </span>

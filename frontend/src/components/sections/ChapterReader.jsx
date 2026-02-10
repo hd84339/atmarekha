@@ -83,21 +83,9 @@ export default function ChapterReader({ chapterId, onBack }) {
                     </div>
                 )}
 
-                {/* Image Mode */}
+                {/* Image Mode (Swipeable) */}
                 {chapter.pages && chapter.pages.length > 0 && (
-                    <div className="mx-auto max-w-4xl">
-                        <div className="flex flex-col gap-0">
-                            {chapter.pages.map((page, index) => (
-                                <img
-                                    key={index}
-                                    src={page}
-                                    alt={`Page ${index + 1}`}
-                                    className="w-full"
-                                    loading="lazy"
-                                />
-                            ))}
-                        </div>
-                    </div>
+                    <SwipeableReader pages={chapter.pages} />
                 )}
 
                 {/* No Content */}
@@ -113,6 +101,137 @@ export default function ChapterReader({ chapterId, onBack }) {
                     </div>
                 )}
             </div>
+        </div>
+    );
+}
+
+function SwipeableReader({ pages }) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [touchStart, setTouchStart] = useState(null);
+    const [touchEnd, setTouchEnd] = useState(null);
+
+    // Minimum swipe distance (in px)
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e) => {
+        setTouchEnd(null); // Reset touch end
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe) {
+            nextPage();
+        } else if (isRightSwipe) {
+            prevPage();
+        }
+    };
+
+    const nextPage = () => {
+        if (currentIndex < pages.length - 1) {
+            setCurrentIndex(prev => prev + 1);
+            window.scrollTo(0, 0);
+        }
+    };
+
+    const prevPage = () => {
+        if (currentIndex > 0) {
+            setCurrentIndex(prev => prev - 1);
+            window.scrollTo(0, 0);
+        }
+    };
+
+    // Keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextPage();
+            } else if (e.key === 'ArrowLeft') {
+                prevPage();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [currentIndex]);
+
+    return (
+        <div
+            className="mx-auto max-w-3xl px-4 min-h-[80vh] flex flex-col justify-center select-none"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+        >
+            <div className="relative mb-6">
+                {/* Image Container */}
+                <div className="relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-900 shadow-sm border border-zinc-200 dark:border-zinc-800">
+                    <img
+                        src={pages[currentIndex]}
+                        alt={`Page ${currentIndex + 1}`}
+                        className="w-full h-auto object-contain max-h-[85vh] mx-auto"
+                        loading="eager"
+                    />
+
+                    {/* Turn Hints (Desktop Hover) */}
+                    <div
+                        className="absolute inset-y-0 left-0 w-1/4 cursor-pointer opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-r from-black/10 to-transparent flex items-center justify-start pl-4"
+                        onClick={prevPage}
+                        title="Previous Page"
+                    >
+                        {currentIndex > 0 && <i className="fas fa-chevron-left text-3xl text-white/70 drop-shadow-md"></i>}
+                    </div>
+                    <div
+                        className="absolute inset-y-0 right-0 w-1/4 cursor-pointer opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-l from-black/10 to-transparent flex items-center justify-end pr-4"
+                        onClick={nextPage}
+                        title="Next Page"
+                    >
+                        {currentIndex < pages.length - 1 && <i className="fas fa-chevron-right text-3xl text-white/70 drop-shadow-md"></i>}
+                    </div>
+                </div>
+            </div>
+
+            {/* Controls */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 p-4 shadow-lg z-40">
+                <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
+                    <button
+                        onClick={prevPage}
+                        disabled={currentIndex === 0}
+                        className="flex-1 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-200 dark:hover:bg-zinc-700 transition active:scale-95"
+                    >
+                        <i className="fas fa-arrow-left mr-2"></i> Prev
+                    </button>
+
+                    <div className="text-center px-4">
+                        <span className="block text-sm font-bold text-zinc-900 dark:text-white">
+                            Page {currentIndex + 1}
+                        </span>
+                        <span className="text-xs text-zinc-500">
+                            of {pages.length}
+                        </span>
+                    </div>
+
+                    <button
+                        onClick={nextPage}
+                        disabled={currentIndex === pages.length - 1}
+                        className="flex-1 py-3 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-800 dark:hover:bg-zinc-200 transition active:scale-95"
+                    >
+                        Next <i className="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+                <p className="text-center text-[10px] text-zinc-400 mt-2">
+                    Tip: Swipe left/right or use arrow keys
+                </p>
+            </div>
+
+            {/* Bottom spacer for fixed controls */}
+            <div className="h-24"></div>
         </div>
     );
 }

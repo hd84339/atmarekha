@@ -17,8 +17,13 @@ import RatingModal from './components/modals/RatingModal';
 import ComingSoonModal from './components/modals/ComingSoonModal';
 import Dashboard from './components/sections/Dashboard';
 import HelpCenter from './components/sections/HelpCenter';
+import About from './components/sections/About';
+import Contact from './components/sections/Contact';
+import LatestUpdates from './components/sections/LatestUpdates';
 
 export default function App() {
+
+
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [activePage, setActivePage] = useState('index');
@@ -37,9 +42,7 @@ export default function App() {
   const [commentsByChapter, setCommentsByChapter] = useState({});
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const heroBg = isDark
-    ? 'linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.7)), url(https://images.pexels.com/photos/16747101/pexels-photo-16747101.jpeg?auto=compress&cs=tinysrgb&w=2070)'
-    : 'linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.7)), url(https://images.pexels.com/photos/16747101/pexels-photo-16747101.jpeg?auto=compress&cs=tinysrgb&w=2070)';
+
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
   useEffect(() => {
@@ -173,13 +176,13 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-100">
+    <div className="min-h-screen bg-premium-cream text-premium-charcoal dark:bg-zinc-950 dark:text-zinc-100">
       <Sidebar isOpen={isNavOpen} onClose={toggleNav} />
       <SiteHeader onToggleNav={toggleNav} />
 
       {activePage === 'index' && (
         <main>
-          <HeroSection heroBg={heroBg} onOpenComingSoon={() => setIsComingSoonOpen(true)} />
+          <HeroSection isDark={isDark} />
           <RecentUpload />
         </main>
       )}
@@ -216,10 +219,9 @@ export default function App() {
       {activePage === 'dashboard' && isAdmin && <Dashboard />}
 
       {activePage === 'help' && <HelpCenter />}
-
-      {activePage === 'help' && <HelpCenter />}
-
-      {activePage === 'help' && <HelpCenter />}
+      {activePage === 'about' && <About />}
+      {activePage === 'contact' && <Contact />}
+      {activePage === 'latest' && <LatestUpdates />}
 
       <Footer isAdmin={isAdmin} onLogout={handleLogout} />
       <ThemeToggle isDark={isDark} onToggle={toggleTheme} />

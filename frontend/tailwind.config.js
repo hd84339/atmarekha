@@ -8,6 +8,12 @@
           950: '#0a0a0a',
           900: '#111111',
           800: '#1a1a1a'
+        },
+        premium: {
+          cream: '#FDFBF7',
+          gold: '#D4AF37',
+          royal: '#1E3A8A',
+          charcoal: '#333333'
         }
       },
       boxShadow: {

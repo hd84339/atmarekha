@@ -3,6 +3,8 @@ import axios from 'axios';
 import AdminStories from './AdminStories';
 import AdminChapters from './AdminChapters';
 import AdminReviews from './AdminReviews';
+import AdminAnnouncements from './AdminAnnouncements';
+import AdminHeroImages from './AdminHeroImages';
 
 export default function Dashboard() {
     const [view, setView] = useState('home');
@@ -62,6 +64,24 @@ export default function Dashboard() {
             );
         }
 
+        if (view === 'announcements') {
+            return (
+                <AdminAnnouncements
+                    apiBaseUrl={apiBaseUrl}
+                    onBack={() => setView('home')}
+                />
+            );
+        }
+
+        if (view === 'hero-images') {
+            return (
+                <AdminHeroImages
+                    apiBaseUrl={apiBaseUrl}
+                    onBack={() => setView('home')}
+                />
+            );
+        }
+
         if (view === 'password') {
             return (
                 <div className="mx-auto max-w-md">
@@ -98,6 +118,22 @@ export default function Dashboard() {
                     >
                         <h3 className="font-semibold text-zinc-900 dark:text-white">Manage Reviews</h3>
                         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Moderate reader reviews.</p>
+                    </div>
+
+                    <div
+                        onClick={() => setView('announcements')}
+                        className="cursor-pointer rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
+                    >
+                        <h3 className="font-semibold text-zinc-900 dark:text-white">Manage Latest Updates</h3>
+                        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Post and edit announcements.</p>
+                    </div>
+
+                    <div
+                        onClick={() => setView('hero-images')}
+                        className="cursor-pointer rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
+                    >
+                        <h3 className="font-semibold text-zinc-900 dark:text-white">Manage Hero Images</h3>
+                        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Add or remove home page slides.</p>
                     </div>
 
                     <div
@@ -187,7 +223,7 @@ function ChangePasswordForm({ apiBaseUrl }) {
                     required
                 />
             </div>
-            
+
             <button
                 type="submit"
                 disabled={status.type === 'loading'}
@@ -197,11 +233,10 @@ function ChangePasswordForm({ apiBaseUrl }) {
             </button>
 
             {status.message && (
-                <div className={`mt-2 rounded-lg p-3 text-sm ${
-                    status.type === 'success' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                    status.type === 'error' ? 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' : 
-                    'bg-zinc-100 text-zinc-600'
-                }`}>
+                <div className={`mt-2 rounded-lg p-3 text-sm ${status.type === 'success' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                    status.type === 'error' ? 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' :
+                        'bg-zinc-100 text-zinc-600'
+                    }`}>
                     {status.message}
                 </div>
             )}

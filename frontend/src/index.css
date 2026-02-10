@@ -9,5 +9,6 @@
 
   body {
     min-height: 100vh;
+    @apply bg-premium-cream text-premium-charcoal dark:bg-zinc-950 dark:text-zinc-100;
   }
 }

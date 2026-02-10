@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Story = require('../models/Story');
-const { parser } = require('../config/cloudinaryConfig');
+const upload = require('../config/multerConfig');
 
 // Get all stories
 // Get all stories (with optional search and category filter)
@@ -40,8 +40,22 @@ router.get('/detail/:id', async (req, res) => {
     }
 });
 
+// Like a story
+router.put('/:id/like', async (req, res) => {
+    try {
+        const story = await Story.findById(req.params.id);
+        if (!story) return res.status(404).json({ message: 'Story not found' });
+
+        story.likes = (story.likes || 0) + 1;
+        await story.save();
+        res.json({ likes: story.likes });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // Create a new story (with cover image)
-router.post('/', parser.single('coverImage'), async (req, res) => {
+router.post('/', upload.single('coverImage'), async (req, res) => {
     try {
         const { title, author, description, status, category } = req.body;
 
@@ -55,7 +69,7 @@ router.post('/', parser.single('coverImage'), async (req, res) => {
             description,
             status,
             category,
-            coverImage: req.file.path // Cloudinary URL
+            coverImage: `/uploads/${req.file.filename}` // Local file URL
         });
 
         const savedStory = await story.save();
@@ -73,8 +87,6 @@ router.delete('/:id', async (req, res) => {
         if (!story) {
             return res.status(404).json({ message: 'Story not found' });
         }
-
-        // TODO: Ideally delete cover image from Cloudinary here too
 
         await story.deleteOne();
         res.json({ message: 'Story deleted successfully' });

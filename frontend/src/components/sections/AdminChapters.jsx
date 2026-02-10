@@ -39,51 +39,54 @@ export default function AdminChapters({ apiBaseUrl, storyId, onBack }) {
         document.getElementById('chapterFiles').value = '';
     };
 
+    const [uploadProgress, setUploadProgress] = useState(0);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // For editing, files are optional (only if replacing)
-        // For creating, files are required
         if (!editingChapter && (!files || files.length === 0)) {
             return alert('Please upload pages (images or PDF)');
         }
 
         setLoading(true);
+        setUploadProgress(0);
 
         const formData = new FormData();
         formData.append('title', title);
         formData.append('chapterNumber', chapterNumber);
 
-        // Append multiple files if selected
         if (files) {
             for (let i = 0; i < files.length; i++) {
                 formData.append('pages', files[i]);
             }
         }
 
+        const axiosConfig = {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                setUploadProgress(percentCompleted);
+            }
+        };
+
         try {
             if (editingChapter) {
-                // Update existing chapter
-                await axios.put(`${apiBaseUrl}/api/chapters/${editingChapter._id}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
+                await axios.put(`${apiBaseUrl}/api/chapters/${editingChapter._id}`, formData, axiosConfig);
                 alert('Chapter updated successfully!');
             } else {
-                // Create new chapter
-                await axios.post(`${apiBaseUrl}/api/chapters/${storyId}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
+                await axios.post(`${apiBaseUrl}/api/chapters/${storyId}`, formData, axiosConfig);
                 alert('Chapter added successfully!');
             }
 
-            // Reset form
             handleCancelEdit();
             fetchChapters();
         } catch (err) {
-            console.error(err);
-            alert(`Failed to ${editingChapter ? 'update' : 'add'} chapter`);
+            console.error('Upload Error:', err);
+            const errMsg = err.response?.data?.message || err.message;
+            alert(`Failed to ${editingChapter ? 'update' : 'add'} chapter: ${errMsg}`);
         } finally {
             setLoading(false);
+            setUploadProgress(0);
         }
     };
 
@@ -150,12 +153,28 @@ export default function AdminChapters({ apiBaseUrl, storyId, onBack }) {
                         />
                         <p className="mt-1 text-xs text-zinc-400">Select multiple images for pages, or a single PDF.</p>
                     </div>
+                    {loading && (
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-blue-600 font-medium font-semibold">Uploading...</span>
+                                <span className="text-blue-600 font-bold">{uploadProgress}%</span>
+                            </div>
+                            <div className="h-2 w-full overflow-hidden rounded-full bg-blue-100 dark:bg-zinc-800">
+                                <div
+                                    className="h-full bg-blue-600 transition-all duration-300 ease-out shadow-[0_0_10px_rgba(37,99,235,0.5)]"
+                                    style={{ width: `${uploadProgress}%` }}
+                                ></div>
+                            </div>
+                            <p className="text-[10px] text-zinc-400 text-center italic">Please do not refresh the page while uploading.</p>
+                        </div>
+                    )}
+
                     <button
                         type="submit"
                         disabled={loading}
-                        className="rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
+                        className="w-full rounded-lg bg-blue-600 px-6 py-3 font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                     >
-                        {loading ? 'Saving...' : (editingChapter ? 'Update Chapter' : 'Add Chapter')}
+                        {loading ? 'Processing Cloud Upload...' : (editingChapter ? 'Update Chapter' : 'Add Chapter')}
                     </button>
                 </form>
             </div>
@@ -167,7 +186,9 @@ export default function AdminChapters({ apiBaseUrl, storyId, onBack }) {
                         <div key={chapter._id} className="flex items-center justify-between rounded-lg border border-zinc-100 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
                             <div>
                                 <h3 className="font-medium dark:text-white">Chapter {chapter.chapterNumber}: {chapter.title}</h3>
-                                <p className="text-sm text-zinc-500">{chapter.pages.length} pages</p>
+                                <p className="text-sm text-zinc-500">
+                                    {chapter.pdfUrl ? 'PDF Document' : `${chapter.pages.length} pages`}
+                                </p>
                             </div>
                             <div className="flex gap-2">
                                 <button

@@ -11,13 +11,27 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: 'atmarekha_stories', // Folder name in Cloudinary
-        allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'],
-        resource_type: 'auto' // Allow image and raw files (for PDF)
+    params: async (req, file) => {
+        console.log('Cloudinary processing file:', file.originalname, 'Type:', file.mimetype);
+
+        // For PDFs, use 'raw' resource type, for images use 'image'
+        const resourceType = file.mimetype === 'application/pdf' ? 'raw' : 'image';
+
+        return {
+            folder: 'atmarekha_stories',
+            allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'],
+            resource_type: resourceType,
+            // Increase chunk size for large files
+            chunk_size: 6000000 // 6MB chunks
+        };
     }
 });
 
-const parser = multer({ storage: storage });
+const parser = multer({
+    storage: storage,
+    limits: {
+        fileSize: 200 * 1024 * 1024 // 200MB max file size
+    }
+});
 
 module.exports = { cloudinary, parser };
