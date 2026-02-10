@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Story = require('../models/Story');
 const upload = require('../config/multerConfig');
+const fs = require('fs');
+const path = require('path');
 
 // Get all stories
 // Get all stories (with optional search and category filter)
@@ -69,7 +71,7 @@ router.post('/', upload.single('coverImage'), async (req, res) => {
             description,
             status,
             category,
-            coverImage: `/uploads/${req.file.filename}` // Local file URL
+            coverImage: `/uploads/covers/${req.file.filename}` // Local file URL
         });
 
         const savedStory = await story.save();
@@ -86,6 +88,17 @@ router.delete('/:id', async (req, res) => {
         const story = await Story.findById(req.params.id);
         if (!story) {
             return res.status(404).json({ message: 'Story not found' });
+        }
+
+        // Delete cover image if it exists
+        if (story.coverImage) {
+            const relativePath = story.coverImage.startsWith('/') ? story.coverImage.slice(1) : story.coverImage;
+            const filePath = path.join(__dirname, '..', relativePath);
+
+            fs.unlink(filePath, (err) => {
+                if (err) console.error('Failed to delete cover image:', err);
+                else console.log('Deleted cover image:', filePath);
+            });
         }
 
         await story.deleteOne();

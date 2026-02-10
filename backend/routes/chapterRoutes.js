@@ -3,6 +3,8 @@ const router = express.Router();
 const Chapter = require('../models/Chapter');
 const Story = require('../models/Story');
 const upload = require('../config/multerConfig');
+const fs = require('fs');
+const path = require('path');
 
 // Get a single chapter by ID
 router.get('/detail/:id', async (req, res) => {
@@ -81,10 +83,10 @@ router.post('/:storyId', (req, res, next) => {
                 });
 
                 if (file.mimetype === 'application/pdf') {
-                    pdfUrl = `/uploads/${file.filename}`;
+                    pdfUrl = `/uploads/pdfs/${file.filename}`;
                     console.log('PDF detected, set pdfUrl:', pdfUrl);
                 } else {
-                    pages.push(`/uploads/${file.filename}`);
+                    pages.push(`/uploads/pages/${file.filename}`);
                     console.log('Image added to pages');
                 }
             });
@@ -134,9 +136,9 @@ router.put('/:id', upload.array('pages'), async (req, res) => {
 
             req.files.forEach(file => {
                 if (file.mimetype === 'application/pdf') {
-                    newPdfUrl = `/uploads/${file.filename}`;
+                    newPdfUrl = `/uploads/pdfs/${file.filename}`;
                 } else {
-                    newPages.push(`/uploads/${file.filename}`);
+                    newPages.push(`/uploads/pages/${file.filename}`);
                 }
             });
 
@@ -166,6 +168,27 @@ router.delete('/:id', async (req, res) => {
     try {
         const chapter = await Chapter.findById(req.params.id);
         if (!chapter) return res.status(404).json({ message: 'Chapter not found' });
+
+        // Helper to delete file
+        const deleteFile = (fileUrl) => {
+            if (!fileUrl) return;
+            const relativePath = fileUrl.startsWith('/') ? fileUrl.slice(1) : fileUrl;
+            const filePath = path.join(__dirname, '..', relativePath);
+            fs.unlink(filePath, (err) => {
+                if (err) console.error(`Failed to delete file ${filePath}:`, err.message);
+                else console.log('Deleted file:', filePath);
+            });
+        };
+
+        // Delete PDF if exists
+        if (chapter.pdfUrl) {
+            deleteFile(chapter.pdfUrl);
+        }
+
+        // Delete all page images if exist
+        if (chapter.pages && chapter.pages.length > 0) {
+            chapter.pages.forEach(pageUrl => deleteFile(pageUrl));
+        }
 
         await chapter.deleteOne();
         res.json({ message: 'Chapter deleted successfully' });

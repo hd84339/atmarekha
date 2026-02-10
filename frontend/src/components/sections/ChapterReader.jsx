@@ -75,7 +75,7 @@ export default function ChapterReader({ chapterId, onBack }) {
                     <div className="mx-auto max-w-5xl px-6">
                         <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                             <iframe
-                                src={chapter.pdfUrl}
+                                src={`${apiBaseUrl}${chapter.pdfUrl}`}
                                 className="h-[85vh] w-full"
                                 title="Chapter PDF"
                             />
@@ -85,7 +85,7 @@ export default function ChapterReader({ chapterId, onBack }) {
 
                 {/* Image Mode (Swipeable) */}
                 {chapter.pages && chapter.pages.length > 0 && (
-                    <SwipeableReader pages={chapter.pages} />
+                    <SwipeableReader pages={chapter.pages} apiBaseUrl={apiBaseUrl} />
                 )}
 
                 {/* No Content */}
@@ -105,7 +105,7 @@ export default function ChapterReader({ chapterId, onBack }) {
     );
 }
 
-function SwipeableReader({ pages }) {
+function SwipeableReader({ pages, apiBaseUrl }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [touchStart, setTouchStart] = useState(null);
     const [touchEnd, setTouchEnd] = useState(null);
@@ -173,7 +173,7 @@ function SwipeableReader({ pages }) {
                 {/* Image Container */}
                 <div className="relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-900 shadow-sm border border-zinc-200 dark:border-zinc-800">
                     <img
-                        src={pages[currentIndex]}
+                        src={`${apiBaseUrl}${pages[currentIndex]}`}
                         alt={`Page ${currentIndex + 1}`}
                         className="w-full h-auto object-contain max-h-[85vh] mx-auto"
                         loading="eager"

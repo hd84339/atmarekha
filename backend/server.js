@@ -76,12 +76,16 @@ const seedAdmin = async () => {
   try {
     const count = await Admin.countDocuments();
     if (count === 0) {
-      const defaultEmail = (process.env.ADMIN_EMAIL || 'admin@example.com').trim();
       const defaultPassword = process.env.ADMIN_PASSWORD || 'change-me';
 
-      const admin = new Admin({ email: defaultEmail, password: defaultPassword });
-      await admin.save();
-      console.log(`Admin seeded: ${defaultEmail}`);
+      // Create admin accounts for all emails in ADMIN_EMAILS
+      for (const email of ADMIN_EMAILS) {
+        const admin = new Admin({ email, password: defaultPassword });
+        await admin.save();
+        console.log(`Admin seeded: ${email}`);
+      }
+    } else {
+      console.log(`${count} admin account(s) already exist`);
     }
   } catch (err) {
     console.error('Admin seeding failed:', err);
