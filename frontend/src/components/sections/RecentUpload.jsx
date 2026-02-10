@@ -5,7 +5,7 @@ import ReviewModal from '../modals/ReviewModal';
 
 export default function RecentUpload() {
   const [stories, setStories] = useState([]);
-  const [reviewStory, setReviewStory] = useState(null); // Story being reviewed
+  const [reviewStory, setReviewStory] = useState(null);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
   useEffect(() => {
@@ -21,44 +21,96 @@ export default function RecentUpload() {
   }, []);
 
   const handleReviewClick = (e, story) => {
-    e.stopPropagation(); // Prevent card click (navigation)
+    e.stopPropagation();
     setReviewStory(story);
   };
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-12">
-      <h2 className="mb-7 text-center text-xl font-semibold text-zinc-900 dark:text-white">Recent Uploads</h2>
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <section className="mx-auto max-w-7xl px-6 py-20">
+      <div className="mb-12 flex flex-col items-center text-center">
+        <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+          Latest Releases
+        </h2>
+        <p className="mt-4 max-w-2xl text-lg text-zinc-600 dark:text-zinc-400">
+          Discover our newest collection of immersive stories, updated weekly.
+        </p>
+      </div>
+
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:gap-10">
         {stories.map(story => (
           <div
             key={story._id}
-            className="card-animate overflow-hidden rounded-xl border border-zinc-200 bg-white transition hover:-translate-y-1.5 hover:shadow-deep dark:border-zinc-800 dark:bg-zinc-900 cursor-pointer group"
             onClick={() => window.location.hash = `#reading/${story._id}`}
+            className="group relative cursor-pointer overflow-hidden rounded-2xl bg-white shadow-md transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:bg-zinc-900/50 dark:shadow-none dark:ring-1 dark:ring-white/10 dark:hover:bg-zinc-800/80 dark:hover:ring-white/20"
           >
-            <div className="relative">
+            {/* Image Container */}
+            <div className="relative aspect-[4/3] overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100 z-10"></div>
               <img
                 src={story.coverImage}
                 alt={story.title}
-                className="h-56 w-full object-cover"
+                className="h-full w-full object-cover transition-transform duration-700 will-change-transform group-hover:scale-110"
+                loading="lazy"
               />
+
+              {/* Category/Status Badge */}
+              <div className="absolute top-4 left-4 z-20">
+                <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-bold uppercase tracking-wider text-black backdrop-blur-md dark:bg-black/70 dark:text-white">
+                  {story.status}
+                </span>
+              </div>
+
+              {/* Review Button (Hover Only) */}
               <button
                 onClick={(e) => handleReviewClick(e, story)}
-                className="absolute top-3 right-3 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-blue-600 shadow-md backdrop-blur transition hover:bg-white hover:text-blue-700 opacity-0 group-hover:opacity-100"
+                className="absolute top-4 right-4 z-20 flex h-8 w-8 translate-y-2 items-center justify-center rounded-full bg-white text-zinc-900 opacity-0 shadow-lg transition-all duration-300 hover:bg-blue-600 hover:text-white group-hover:translate-y-0 group-hover:opacity-100"
+                title="Write a Review"
               >
-                <i className="fa-regular fa-pen-to-square mr-1"></i> Review
+                <i className="fa-regular fa-pen-to-square text-sm"></i>
               </button>
             </div>
-            <div className="p-5">
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">{story.title}</h3>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{story.author}</p>
-              <span className="mt-3 inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                {story.status}
-              </span>
+
+            {/* Content */}
+            <div className="relative p-6">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-xs font-medium uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  {story.author || 'AtmaRekha Original'}
+                </p>
+                <div className="flex items-center gap-1 text-xs text-zinc-400">
+                  <i className="fa-regular fa-clock"></i>
+                  <span>New</span>
+                </div>
+              </div>
+
+              <h3 className="mb-2 text-xl font-bold leading-tight text-zinc-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+                {story.title}
+              </h3>
+
+              <p className="line-clamp-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                {story.description || 'Enter a world of mystery and intrigue. Follow the journey as it unfolds...'}
+              </p>
+
+              {/* Footer / CTA */}
+              <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-white/10">
+                <span className="text-sm font-medium text-zinc-500 transition-colors group-hover:text-zinc-900 dark:text-zinc-500 dark:group-hover:text-white">
+                  Read Story
+                </span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-zinc-900 transition-colors group-hover:bg-blue-600 group-hover:text-white dark:bg-white/10 dark:text-white dark:group-hover:bg-blue-600">
+                  <i className="fa-solid fa-arrow-right text-xs"></i>
+                </div>
+              </div>
             </div>
           </div>
         ))}
+
         {stories.length === 0 && (
-          <p className="col-span-full text-center text-zinc-500">No stories available.</p>
+          <div className="col-span-full py-20 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+              <i className="fa-solid fa-book-open text-2xl text-zinc-400 dark:text-zinc-500"></i>
+            </div>
+            <h3 className="text-lg font-medium text-zinc-900 dark:text-white">No stories yet</h3>
+            <p className="text-zinc-500 dark:text-zinc-400">Check back soon for new uploads!</p>
+          </div>
         )}
       </div>
 

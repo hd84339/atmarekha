@@ -38,6 +38,9 @@ const storyRoutes = require('./routes/storyRoutes');
 const chapterRoutes = require('./routes/chapterRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 
+const Admin = require('./models/Admin');
+const bcrypt = require('bcryptjs');
+
 app.get('/', (req, res) => {
   res.json({ status: 'AtmaRekha backend running' });
 });
@@ -46,15 +49,67 @@ app.use('/api/stories', storyRoutes);
 app.use('/api/chapters', chapterRoutes);
 app.use('/api/reviews', reviewRoutes);
 
+// --- Admin Auth Routes ---
 
-app.post('/admin/login', (req, res) => {
+// Seed Admin (Run on server start)
+const seedAdmin = async () => {
+    try {
+        const count = await Admin.countDocuments();
+        if (count === 0) {
+            const defaultEmail = (process.env.ADMIN_EMAIL || 'admin@example.com').trim();
+            const defaultPassword = process.env.ADMIN_PASSWORD || 'change-me';
+            
+            const admin = new Admin({ email: defaultEmail, password: defaultPassword });
+            await admin.save();
+            console.log(`Admin seeded: ${defaultEmail}`);
+        }
+    } catch (err) {
+        console.error('Admin seeding failed:', err);
+    }
+};
+seedAdmin();
+
+app.post('/admin/login', async (req, res) => {
   const { email, password } = req.body || {};
 
-  if (ADMIN_EMAILS.includes(email) && password === ADMIN_PASSWORD) {
-    return res.json({ success: true, role: 'admin' });
-  }
+  try {
+      const admin = await Admin.findOne({ email });
+      if (!admin) {
+          return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
 
-  return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      const isMatch = await admin.comparePassword(password);
+      if (!isMatch) {
+          return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
+
+      return res.json({ success: true, role: 'admin', email: admin.email });
+  } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/admin/change-password', async (req, res) => {
+    const { email, oldPassword, newPassword } = req.body;
+
+    try {
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(404).json({ success: false, message: 'Admin not found' });
+        }
+
+        const isMatch = await admin.comparePassword(oldPassword);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Incorrect old password' });
+        }
+
+        admin.password = newPassword; // Will be hashed by pre-save hook
+        await admin.save();
+
+        res.json({ success: true, message: 'Password updated successfully' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
 });
 
 app.listen(process.env.PORT || 5000, () => {

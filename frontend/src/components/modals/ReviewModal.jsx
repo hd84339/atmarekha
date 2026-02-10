@@ -51,7 +51,7 @@ export default function ReviewModal({ isOpen, onClose, storyId, storyTitle }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
             <div className="flex h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-zinc-900 md:flex-row">
                 {/* Form Section */}
                 <div className="w-full overflow-y-auto p-6 md:w-1/2 md:border-r border-zinc-200 dark:border-zinc-800">

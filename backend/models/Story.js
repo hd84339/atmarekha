@@ -24,6 +24,12 @@ const storySchema = new mongoose.Schema({
         enum: ['Ongoing', 'Completed', 'Hiatus'],
         default: 'Ongoing'
     },
+    category: {
+        type: String,
+        required: true,
+        default: 'Fantasy',
+        enum: ['Fantasy', 'Action', 'Drama', 'Horror', 'Romance', 'Sci-Fi', 'Slice of Life', 'Mystery']
+    },
     createdAt: {
         type: Date,
         default: Date.now

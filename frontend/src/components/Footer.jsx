@@ -2,7 +2,7 @@
   return (
     <footer className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
       <div className="mx-auto max-w-7xl px-8 py-12 lg:py-16">
-        <div className="grid gap-12 lg:grid-cols-5 lg:gap-8">
+        <div className="grid gap-8 lg:grid-cols-5 lg:gap-8">
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <a href="#index" className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
@@ -111,7 +111,13 @@
 
         <div className="mt-12 border-t border-zinc-100 pt-8 dark:border-zinc-800">
           <p className="text-center text-xs text-zinc-400 dark:text-zinc-500">
-            &copy; {new Date().getFullYear()} Atma Rekha. All rights reserved. Designed with passion.
+            &copy; {new Date().getFullYear()} Atma Rekha. All rights reserved. <br className="sm:hidden" />
+            <span className="opacity-70 mx-2 hidden sm:inline">|</span>
+            Designed with passion.
+            <span className="opacity-70 mx-2">|</span>
+            <a href="https://www.linkedin.com/in/harsh-dubey-498498256/" target="_blank" rel="noreferrer" className="font-semibold transition hover:text-blue-600 dark:hover:text-blue-400">
+              Developer Harsh Dubey
+            </a>
           </p>
         </div>
       </div>

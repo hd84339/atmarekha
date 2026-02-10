@@ -22,6 +22,7 @@ export default function AdminLogin({ apiBaseUrl, onLoginSuccess }) {
       }
 
       setStatus({ type: 'success', message: 'Login successful. Welcome, Admin!' });
+      localStorage.setItem('adminEmail', email); // Store email for password change
       onLoginSuccess?.(data);
     } catch (error) {
       setStatus({ type: 'error', message: error.message || 'Login failed.' });

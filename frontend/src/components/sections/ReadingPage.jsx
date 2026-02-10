@@ -9,7 +9,8 @@ export default function ReadingPage({
   onToggleSave,
   onSortToggle,
   onOpenComments,
-  onBack
+  onBack,
+  isReversed // Added missing prop
 }) {
   const [chapters, setChapters] = useState([]);
   const [story, setStory] = useState(null);
@@ -174,37 +175,42 @@ export default function ReadingPage({
         {/* Chapter List */}
         <div className="flex flex-col gap-4">
           {chapters.length > 0 ? (
-            chapters.map((ch, index) => (
-              <div
-                key={ch._id}
-                className="group relative flex items-center justify-between rounded-xl bg-white p-4 shadow-sm ring-1 ring-zinc-100 transition-all duration-300 hover:scale-[1.01] hover:shadow-md hover:ring-blue-500/20 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:ring-blue-500/30"
-              >
-                <a href={`#read-chapter/${ch._id}`} className="flex flex-1 items-center gap-5">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 font-bold text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white dark:bg-blue-900/20 dark:text-blue-400">
-                    {ch.chapterNumber}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="truncate font-bold text-zinc-900 transition-colors group-hover:text-blue-600 dark:text-white">{ch.title}</h3>
-                    <div className="mt-1 flex items-center gap-3 text-xs text-zinc-400">
-                      <span>{new Date(ch.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                      <span className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
-                      <span>{Math.ceil(Math.random() * 5 + 2)} min read</span>
-                    </div>
-                  </div>
-                </a>
-
-                <button
-                  className="ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-zinc-300 transition hover:bg-blue-50 hover:text-blue-600 dark:text-zinc-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenComments(ch.chapterNumber);
-                  }}
-                  title="Read & Comment"
+            [...chapters]
+              .sort((a, b) => isReversed
+                ? new Date(b.createdAt) - new Date(a.createdAt)
+                : new Date(a.createdAt) - new Date(b.createdAt)
+              )
+              .map((ch, index) => (
+                <div
+                  key={ch._id}
+                  className="group relative flex items-center justify-between rounded-xl bg-white p-4 shadow-sm ring-1 ring-zinc-100 transition-all duration-300 hover:scale-[1.01] hover:shadow-md hover:ring-blue-500/20 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:ring-blue-500/30"
                 >
-                  <i className="fa-solid fa-message"></i>
-                </button>
-              </div>
-            ))
+                  <a href={`#read-chapter/${ch._id}`} className="flex flex-1 items-center gap-5">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 font-bold text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white dark:bg-blue-900/20 dark:text-blue-400">
+                      {ch.chapterNumber}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="truncate font-bold text-zinc-900 transition-colors group-hover:text-blue-600 dark:text-white">{ch.title}</h3>
+                      <div className="mt-1 flex items-center gap-3 text-xs text-zinc-400">
+                        <span>{new Date(ch.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                        <span className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+                        <span>{Math.ceil(Math.random() * 5 + 2)} min read</span>
+                      </div>
+                    </div>
+                  </a>
+
+                  <button
+                    className="ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-zinc-300 transition hover:bg-blue-50 hover:text-blue-600 dark:text-zinc-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenComments(ch.chapterNumber);
+                    }}
+                    title="Read & Comment"
+                  >
+                    <i className="fa-solid fa-message"></i>
+                  </button>
+                </div>
+              ))
           ) : (
             <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 bg-zinc-50 py-16 text-center dark:border-zinc-800 dark:bg-zinc-900/50">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100 text-zinc-300 dark:bg-zinc-800 dark:text-zinc-600">

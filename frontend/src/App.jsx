@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { gsap } from 'gsap';
 import ChapterReader from './components/sections/ChapterReader';
 
@@ -16,6 +16,7 @@ import CommentsSheet from './components/modals/CommentsSheet';
 import RatingModal from './components/modals/RatingModal';
 import ComingSoonModal from './components/modals/ComingSoonModal';
 import Dashboard from './components/sections/Dashboard';
+import HelpCenter from './components/sections/HelpCenter';
 
 export default function App() {
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -38,7 +39,7 @@ export default function App() {
 
   const heroBg = isDark
     ? 'linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.7)), url(https://images.pexels.com/photos/16747101/pexels-photo-16747101.jpeg?auto=compress&cs=tinysrgb&w=2070)'
-    : 'linear-gradient(rgba(249,249,252,0.92), rgba(249,249,252,0.75)), url(https://images.pexels.com/photos/16747101/pexels-photo-16747101.jpeg?auto=compress&cs=tinysrgb&w=2070)';
+    : 'linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.7)), url(https://images.pexels.com/photos/16747101/pexels-photo-16747101.jpeg?auto=compress&cs=tinysrgb&w=2070)';
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
   useEffect(() => {
@@ -194,6 +195,7 @@ export default function App() {
           onSortToggle={() => setIsReversed((prev) => !prev)}
           onOpenComments={openComments}
           onBack={() => (window.location.hash = '#index')}
+          isReversed={isReversed}
         />
       )}
 
@@ -212,6 +214,12 @@ export default function App() {
       )}
 
       {activePage === 'dashboard' && isAdmin && <Dashboard />}
+
+      {activePage === 'help' && <HelpCenter />}
+
+      {activePage === 'help' && <HelpCenter />}
+
+      {activePage === 'help' && <HelpCenter />}
 
       <Footer isAdmin={isAdmin} onLogout={handleLogout} />
       <ThemeToggle isDark={isDark} onToggle={toggleTheme} />

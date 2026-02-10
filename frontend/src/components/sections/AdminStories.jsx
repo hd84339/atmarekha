@@ -8,6 +8,8 @@ export default function AdminStories({ apiBaseUrl }) {
     const [description, setDescription] = useState('');
     const [coverImage, setCoverImage] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [category, setCategory] = useState('Fantasy');
+    const categories = ['Fantasy', 'Action', 'Drama', 'Horror', 'Romance', 'Sci-Fi', 'Slice of Life', 'Mystery'];
 
     useEffect(() => {
         fetchStories();
@@ -31,6 +33,7 @@ export default function AdminStories({ apiBaseUrl }) {
         formData.append('title', title);
         formData.append('author', author);
         formData.append('description', description);
+        formData.append('category', category);
         formData.append('coverImage', coverImage);
         formData.append('status', 'Ongoing');
 
@@ -41,6 +44,7 @@ export default function AdminStories({ apiBaseUrl }) {
             setTitle('');
             setAuthor('');
             setDescription('');
+            setCategory('Fantasy');
             setCoverImage(null);
             // Reset file input manually if needed or just let react re-render
             document.getElementById('coverInput').value = '';
@@ -88,6 +92,20 @@ export default function AdminStories({ apiBaseUrl }) {
                             required
                         />
                     </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <select
+                            value={category}
+                            onChange={e => setCategory(e.target.value)}
+                            className="w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-2 dark:border-zinc-700 dark:text-white"
+                        >
+                            {categories.map(cat => (
+                                <option key={cat} value={cat} className="dark:bg-zinc-900">{cat}</option>
+                            ))}
+                        </select>
+                        <div className="hidden md:block"></div>
+                    </div>
+
                     <textarea
                         placeholder="Description"
                         value={description}
@@ -124,7 +142,10 @@ export default function AdminStories({ apiBaseUrl }) {
                         <div key={story._id} className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
                             <img src={story.coverImage} alt={story.title} className="h-48 w-full object-cover" />
                             <div className="p-4">
-                                <h3 className="font-bold dark:text-white">{story.title}</h3>
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="font-bold dark:text-white">{story.title}</h3>
+                                    <span className="text-xs bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded text-zinc-500">{story.category || 'Fantasy'}</span>
+                                </div>
                                 <p className="text-sm text-zinc-500">{story.author}</p>
                                 <div className="mt-4 flex gap-2">
                                     <button

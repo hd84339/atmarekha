@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import AdminStories from './AdminStories';
 import AdminChapters from './AdminChapters';
 import AdminReviews from './AdminReviews';
@@ -61,6 +62,20 @@ export default function Dashboard() {
             );
         }
 
+        if (view === 'password') {
+            return (
+                <div className="mx-auto max-w-md">
+                    <button onClick={() => setView('home')} className="mb-4 flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white">
+                        &larr; Back to Dashboard
+                    </button>
+                    <div className="rounded-xl border border-zinc-200 bg-white p-8 shadow-md dark:border-zinc-800 dark:bg-zinc-900">
+                        <h2 className="mb-6 text-xl font-bold dark:text-white">Change Password</h2>
+                        <ChangePasswordForm apiBaseUrl={apiBaseUrl} />
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <>
                 <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Admin Dashboard</h1>
@@ -85,6 +100,13 @@ export default function Dashboard() {
                         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Moderate reader reviews.</p>
                     </div>
 
+                    <div
+                        onClick={() => setView('password')}
+                        className="cursor-pointer rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
+                    >
+                        <h3 className="font-semibold text-zinc-900 dark:text-white">Security Settings</h3>
+                        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Change your admin password.</p>
+                    </div>
 
                 </div>
             </>
@@ -99,3 +121,92 @@ export default function Dashboard() {
         </main>
     );
 }
+
+function ChangePasswordForm({ apiBaseUrl }) {
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [status, setStatus] = useState({ type: 'idle', message: '' });
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (newPassword !== confirmPassword) {
+            return setStatus({ type: 'error', message: 'New passwords do not match' });
+        }
+
+        setStatus({ type: 'loading', message: 'Updating password...' });
+        const email = localStorage.getItem('adminEmail');
+
+        try {
+            const res = await axios.post(`${apiBaseUrl}/admin/change-password`, {
+                email,
+                oldPassword,
+                newPassword
+            });
+
+            if (res.data.success) {
+                setStatus({ type: 'success', message: 'Password updated successfully' });
+                setOldPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+            }
+        } catch (err) {
+            setStatus({ type: 'error', message: err.response?.data?.message || 'Failed to update password' });
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Old Password</label>
+                <input
+                    type="password"
+                    value={oldPassword}
+                    onChange={e => setOldPassword(e.target.value)}
+                    className="w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-2 dark:border-zinc-700 dark:text-white"
+                    required
+                />
+            </div>
+            <div>
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">New Password</label>
+                <input
+                    type="password"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    className="w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-2 dark:border-zinc-700 dark:text-white"
+                    required
+                />
+            </div>
+            <div>
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Confirm New Password</label>
+                <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    className="w-full rounded-lg border border-zinc-200 bg-transparent px-4 py-2 dark:border-zinc-700 dark:text-white"
+                    required
+                />
+            </div>
+            
+            <button
+                type="submit"
+                disabled={status.type === 'loading'}
+                className="w-full rounded-lg bg-zinc-900 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+            >
+                {status.type === 'loading' ? 'Updating...' : 'Update Password'}
+            </button>
+
+            {status.message && (
+                <div className={`mt-2 rounded-lg p-3 text-sm ${
+                    status.type === 'success' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                    status.type === 'error' ? 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' : 
+                    'bg-zinc-100 text-zinc-600'
+                }`}>
+                    {status.message}
+                </div>
+            )}
+        </form>
+    );
+}
+
+

@@ -4,9 +4,25 @@ const Story = require('../models/Story');
 const { parser } = require('../config/cloudinaryConfig');
 
 // Get all stories
+// Get all stories (with optional search and category filter)
 router.get('/', async (req, res) => {
     try {
-        const stories = await Story.find().sort({ createdAt: -1 });
+        const { search, category } = req.query;
+        let query = {};
+
+        if (search) {
+            query.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } },
+                { author: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        if (category && category !== 'All') {
+            query.category = category;
+        }
+
+        const stories = await Story.find(query).sort({ createdAt: -1 });
         res.json(stories);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -27,7 +43,7 @@ router.get('/detail/:id', async (req, res) => {
 // Create a new story (with cover image)
 router.post('/', parser.single('coverImage'), async (req, res) => {
     try {
-        const { title, author, description, status } = req.body;
+        const { title, author, description, status, category } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ message: 'Cover image is required' });
@@ -38,6 +54,7 @@ router.post('/', parser.single('coverImage'), async (req, res) => {
             author,
             description,
             status,
+            category,
             coverImage: req.file.path // Cloudinary URL
         });
 
