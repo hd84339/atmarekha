@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
+import logoImg from '../assets/images/logo.png';
 
 export default function SiteHeader({ onToggleNav }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -40,21 +41,20 @@ export default function SiteHeader({ onToggleNav }) {
         : 'bg-transparent border-transparent py-5'
         }`}
     >
-      <a href="#index" className="group flex items-center gap-3">
-        {/* Custom SVG Logo */}
-        <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 shadow-lg shadow-blue-500/20 transition-all duration-300 group-hover:scale-105 group-hover:rotate-3 group-hover:shadow-blue-500/40">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white drop-shadow-md">
-            <path d="M12 2L2 19H5L7 15M22 19H19L17 15M7 15L12 4L17 15M7 15H17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M12 2L12 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-          </svg>
-          <div className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100 mix-blend-overlay"></div>
+      <a href="#index" className="group flex items-center gap-2">
+        <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-105 active:scale-95">
+          <img
+            src={logoImg}
+            alt="Atma Rekha Logo"
+            className="h-full w-full object-contain filter drop-shadow-md"
+          />
         </div>
 
         <div className="flex flex-col">
           <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-none">
             Atma Rekha
           </span>
-          <span className="text-[10px] font-medium tracking-widest text-zinc-400 uppercase leading-none mt-0.5 group-hover:text-zinc-500 transition-colors">
+          <span className="text-[10px] font-medium tracking-widest text-zinc-400 uppercase leading-none mt-1 group-hover:text-zinc-500 transition-colors">
             Manga Platform
           </span>
         </div>

@@ -1,12 +1,17 @@
-﻿export default function Footer({ isAdmin, onLogout }) {
+﻿import logoImg from '../assets/images/logo.png';
+
+export default function Footer({ isAdmin, onLogout }) {
   return (
     <footer className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
       <div className="mx-auto max-w-7xl px-8 py-12 lg:py-16">
         <div className="grid gap-8 lg:grid-cols-5 lg:gap-8">
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <a href="#index" className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
-              Atma Rekha
+            <a href="#index" className="flex items-center gap-3">
+              <img src={logoImg} alt="Atma Rekha Logo" className="h-12 w-12 object-contain" />
+              <span className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
+                Atma Rekha
+              </span>
             </a>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
               Discover the depths of Indian Manga. Dive into stories that resonate with culture, emotion, and creativity.
