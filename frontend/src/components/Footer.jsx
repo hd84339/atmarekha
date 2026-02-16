@@ -13,9 +13,9 @@
             </p>
             <div className="mt-6 flex gap-6 text-zinc-400">
               {[
-                { href: 'https://www.instagram.com/amritanshorg?igsh=MXBwNnp2aWtneHN1cg==', icon: 'fab fa-instagram' },
-                { href: 'https://youtube.com/@amritanshorg?si=pnq7mvRA1PlzyHsB', icon: 'fab fa-youtube' },
-                { href: 'https://x.com/amritansh5u', icon: 'fab fa-x-twitter' },
+                { href: 'https://www.instagram.com/atma.rekha?igsh=MzQ2YWJ3ZW42MzYx', icon: 'fab fa-instagram' },
+                { href: 'https://youtube.com/@atmarekha?si=ytUOmNPrKFtxJUwn', icon: 'fab fa-youtube' },
+                { href: 'https://x.com/atmarekha', icon: 'fab fa-x-twitter' },
                 { href: 'mailto:itsamritanshofficial@gmail.com', icon: 'fas fa-envelope' },
               ].map(({ href, icon }) => (
                 <a
