@@ -13,16 +13,7 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1 && !origin.includes('vercel.app')) {
-      // Just for debugging, we can be permissive or strict. 
-      // Let's be permissive for "atmarekha" domains or vercel deployments
-      return callback(null, true); // For now, allow all to fix the blocking issue immediately
-    }
-    return callback(null, true);
-  },
+  origin: true, // Dynamically allow the requester's origin
   credentials: true
 }));
 app.use(express.json({ limit: '200mb' }));
@@ -39,8 +30,8 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || 'admin@example.com').split(',').map(email => email.trim());
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'change-me';
+const ADMIN_EMAILS = (process.env.ADMIN_EMAIL || process.env.ADMIN_EMAILS || 'admin@example.com').split(',').map(email => email.trim());
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '123455';
 
 const storyRoutes = require('./routes/storyRoutes');
 const chapterRoutes = require('./routes/chapterRoutes');

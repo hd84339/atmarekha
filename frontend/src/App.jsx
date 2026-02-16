@@ -20,7 +20,6 @@ import HelpCenter from './components/sections/HelpCenter';
 import About from './components/sections/About';
 import Contact from './components/sections/Contact';
 import LatestUpdates from './components/sections/LatestUpdates';
-import InfoSection from './components/sections/InfoSection';
 import ImageShowcase from './components/sections/ImageShowcase';
 
 export default function App() {
@@ -186,7 +185,6 @@ export default function App() {
         <main>
           <HeroSection isDark={isDark} />
           <RecentUpload />
-          <InfoSection />
           <ImageShowcase />
         </main>
       )}
